@@ -52,4 +52,4 @@ jobs:
           
 
       - name: Deploy static site to S3 bucket
-        run: s3cmd --acl-public sync --delete-removed ./docs/.vuepress/dist/  s3://vuepress
+        run: s3cmd --acl-public sync --delete-removed ./docs/.vuepress/dist/  s3://vuepress-test-jchauvin
