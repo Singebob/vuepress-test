@@ -59,4 +59,6 @@ jobs:
           
 
       - name: Deploy static site to S3 bucket
-        run: aws s3 sync ./docs/dist s3://vuepress --delete
+        run: |
+          ls ./
+          aws s3 sync ./docs/dist s3://vuepress --delete
