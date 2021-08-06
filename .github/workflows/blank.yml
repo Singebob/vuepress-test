@@ -31,13 +31,32 @@ jobs:
       - name: Build docs
         run: npm run docs:build
       
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.SCALEWAY_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.SCALEWAY_SECRET_ACCESS_KEY }}
-          aws-region: fr-par
+      - name: Configure AWS
+        run: |
+          mkdir -p ~/.aws
+          touch ~/.aws/config
+          
+          echo "[plugins]
+          endpoint = awscli_plugin_endpoint
+
+          [default]
+          region = fr-par
+          s3 =
+            endpoint_url = https://s3.fr-par.scw.cloud
+            signature_version = s3v4
+            max_concurrent_requests = 100
+            max_queue_size = 1000
+            multipart_threshold = 50MB
+            # Edit the multipart_chunksize value according to the file sizes that you want to upload. The present configuration allows to upload files up to 10 GB (100 requests * 10MB). For example setting it to 5GB allows you to upload files up to 5TB.
+            multipart_chunksize = 10MB
+          s3api =
+            endpoint_url = https://s3.fr-par.scw.cloud" > ~/.aws/config
+          touch ~/.aws/credentials
+
+          echo "[default]
+          aws_access_key_id = ${{ secrets.SCALEWAY_ACCESS_KEY_ID }}
+          aws_secret_access_key = ${{ secrets.SCALEWAY_SECRET_KEY_ID }}" > ~/.aws/credentials 
           
 
       - name: Deploy static site to S3 bucket
-        run: aws --endpoint-url https://s3.fr-par.scw.cloud s3 sync ./docs/dist s3://vuepress --delete
+        run: aws s3 sync ./docs/dist s3://vuepress --delete
